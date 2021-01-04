@@ -5,7 +5,8 @@ import {
   TextInput,
   View,
   TouchableOpacity,
-  Keyboard
+  Keyboard,
+  Image
 } from 'react-native';
 
 const defaultItemValue = {
@@ -19,6 +20,7 @@ export default class SearchableDropDown extends Component {
     this.renderFlatList = this.renderFlatList.bind(this);
     this.searchedItems = this.searchedItems.bind(this);
     this.renderItems = this.renderItems.bind(this);
+    
     this.state = {
       item: {},
       listItems: [],
@@ -135,6 +137,10 @@ export default class SearchableDropDown extends Component {
             }, 0);
           }}
         >
+          {
+            this.props.image &&
+            <Image style={{ width:23, height:21, marginEnd: 5 }} source={{uri: item.imageUrl}}/>
+          }
           { 
             this.props.selectedItems && this.props.selectedItems.length > 0 && this.props.selectedItems.find(x => x.id === item.id) 
             ?
@@ -171,13 +177,13 @@ export default class SearchableDropDown extends Component {
       {
         key: 'onBlur',
         val: () => {
-          this.props.onBlur && this.props.onBlur(this);
-          this.setState({ focus: false, item: this.props.selectedItems });
+          this.props.onBlur && this.props.onBlur()
+          this.setState({ focus: false })
         }
       },
       {
         key: 'value',
-        val: this.state.item ? this.state.item.name : ''
+        val: this.state.item.name
       },
       {
         key: 'style',
@@ -207,17 +213,7 @@ export default class SearchableDropDown extends Component {
     });
     return (
       <TextInput
-      { ...textInputProps }
-      onBlur={(e) => {
-        if (this.props.onBlur) {
-          this.props.onBlur(e);
-        }
-        if (this.props.textInputProps && this.props.textInputProps.onBlur) {
-          this.props.textInputProps.onBlur(e);
-        }
-        this.setState({ focus: false, item: this.props.selectedItems });
-      }
-      }
+       { ...textInputProps }
       />
     )
   }
@@ -235,7 +231,7 @@ export default class SearchableDropDown extends Component {
     );
   };
   renderSelectedItems(){
-    let items = this.props.selectedItems || [];
+    let items = this.props.selectedItems;
     if(items !== undefined && items.length > 0 && this.props.chip && this.props.multi){
      return  <View style={{flexDirection: 'row',  flexWrap: 'wrap', paddingBottom: 10, marginTop: 5 }}>
                  { items.map((item, index) => {
